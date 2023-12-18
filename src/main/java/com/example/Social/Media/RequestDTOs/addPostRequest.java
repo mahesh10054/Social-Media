@@ -13,4 +13,6 @@ public class addPostRequest {
     private String url;
     private PostStatus postStatus;
     private String userName;
+    private String password;
+
 }

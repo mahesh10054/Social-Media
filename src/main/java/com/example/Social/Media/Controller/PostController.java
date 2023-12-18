@@ -19,13 +19,13 @@ public class PostController {
         return postService.addPost(addPostRequest);
     }
     @GetMapping("/getPost")
-    public ResponseEntity<?> getPost(@RequestParam String userName)
+    public ResponseEntity<?> getPost(@RequestParam String userName, @RequestParam String password)
     {
-        return postService.getPost(userName);
+        return postService.getPost(userName,password);
     }
     @GetMapping("/getOtherAccountPost/{otherUserName}")
-    public ResponseEntity<?> getOtherAccountPost(@RequestParam String userName, @PathVariable String otherUserName)
+    public ResponseEntity<?> getOtherAccountPost(@RequestParam String userName,@RequestParam String password,@PathVariable String otherUserName)
     {
-        return postService.getOtherAccountPost(userName,otherUserName);
+        return postService.getOtherAccountPost(userName,password,otherUserName);
     }
 }

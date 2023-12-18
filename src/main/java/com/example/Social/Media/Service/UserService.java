@@ -24,40 +24,73 @@ public class UserService {
     @Autowired // By using autowired annotation we create object of another class without using new keyword
     UserRepository userRepository;
 
-    public String addUser(addUserRequest addUserRequest) {
+    // this function for create user account
+    public String createAccount(addUserRequest addUserRequest) {
+
+        // here we have check username already present of not
         if(userRepository.findUserByUserName(addUserRequest.getUserName()) != null)
             return "User Name Already Exist";
 
+        // here we have check user email already present of not
         if(userRepository.findUserByEmail(addUserRequest.getEmail()) != null)
             return "User Email Already Exist";
 
+        String email = addUserRequest.getEmail();
+        int eLength = email.length();
+        String str = "@gmail.com";
+
+        if(eLength <= str.length())
+        {
+            return "Please Enter Valid Email Address";
+        }
+        int n = eLength - str.length();
+        String s = email.substring(n,eLength);
+
+        if(!str.equals(s))
+        {
+            return "Please Enter Valid Email Address";
+        }
+
         User user = UserTransformers.convertAddUserRequestToEntity(addUserRequest);
 
+        // here we have save the user on to the DB
         userRepository.save(user);
 
         return "User Added Successfully";
     }
 
-    public String followingRequest(String userName,String followingName) {
+    public ResponseEntity<?> updateUserAccount(String userName, String password) {
         User user = userRepository.findUserByUserName(userName);
-        User followinguser = userRepository.findUserByUserName(followingName);
-        if(followinguser == null)
+        if(user == null) return ResponseEntity.ok("User Does Not Exist");
+
+        if(!user.getPassword().equals(password)) return ResponseEntity.ok("Password is Wrong!!!");
+
+        return ResponseEntity.ok(user);
+    }
+    // this function for send following request to another user
+    public String followingRequest(String userName,String password,String followingUserName) {
+        User user = userRepository.findUserByUserName(userName); // here we can get user account
+        User followinguser = userRepository.findUserByUserName(followingUserName); //here we get following user account
+
+        if(followinguser == null) // here we check following user present or not
             return "You Are Following does Not Exist";
-        if(user == null)
+        if(user == null) // here we check user present or not
             return "User does Not Exist";
 
-        List<String> userFollowingList = user.getFollowing();
+        if(!user.getPassword().equals(password)) return "Password is Wrong!!!";
 
+        List<String> userFollowingList = user.getFollowing(); //here we get following list
+
+        // if user following list is empty then create new list and set the list using user setFollowing function
+        // else we can check user already following another user then we return "You Already Following".
         if(userFollowingList == null) {
             userFollowingList = new ArrayList<>();
             user.setFollowing(userFollowingList);
         } else {
-            for(String followingName1 : userFollowingList)
-            {
-                if (followingName1.equals(followingName)) return "You Already Following";
-            }
+           if(userFollowingList.contains(followingUserName)) return "You Already Following";
         }
-        userFollowingList.add(followingName);
+        // and add the following user name into the list
+        userFollowingList.add(followingUserName);
 
         List<String> followingUserList = followinguser.getFollow();
 
@@ -70,31 +103,36 @@ public class UserService {
 
         userRepository.save(user);
         userRepository.save(followinguser);
+
         return "You Following Successfully";
     }
 
-    public ResponseEntity<?> getFollowings(String userName) {
+    public ResponseEntity<?> getFollowings(String userName,String password) {
         User user = userRepository.findUserByUserName(userName);
+
         if(user == null) return ResponseEntity.ok("User Not found !!!");
+        if(!user.getPassword().equals(password)) return ResponseEntity.ok("Password is Wrong!!!");
 
         List<String> followingList = user.getFollowing();
 
         return ResponseEntity.ok(followingList);
     }
 
-    public ResponseEntity<?> getFollows(String userName) {
+    public ResponseEntity<?> getFollows(String userName,String password) {
         User user = userRepository.findUserByUserName(userName);
 
         if(user == null) return ResponseEntity.ok("User Not found !!!");
+        if(!user.getPassword().equals(password)) return ResponseEntity.ok("Password is Wrong!!!");
 
         List<String> followList = user.getFollow();
         return ResponseEntity.ok(followList);
     }
 
-    public ResponseEntity<?> getAllPost(String userName) {
+    public ResponseEntity<?> getAllPost(String userName,String password) {
         User user = userRepository.findUserByUserName(userName);
 
         if(user == null) return ResponseEntity.ok("User Not found !!!");
+        if(!user.getPassword().equals(password)) return ResponseEntity.ok("Password is Wrong!!!");
 
         List<Post> postList = user.getPostList();
 
@@ -108,8 +146,12 @@ public class UserService {
         return ResponseEntity.ok(ans);
     }
 
-    public ResponseEntity<?> getAllAccount(String userName) {
+    public ResponseEntity<?> getAllAccount(String userName,String password) {
         User user = userRepository.findUserByUserName(userName);
+
+        if(user == null) return ResponseEntity.ok("User Not found!!!");
+        if(!user.getPassword().equals(password)) return ResponseEntity.ok("Password is Wrong!!!");
+
         if(!user.getUserStatus().equals(UserStatus.Admin)){
             return ResponseEntity.ok("You are not a Admin");
         }
@@ -127,9 +169,12 @@ public class UserService {
         return ResponseEntity.ok(addDummyUserRequestList);
     }
 
-    public String deleteAccount(String userName, String deleteUserName) {
+    public String deleteAccount(String userName, String password,String deleteUserName) {
         User user = userRepository.findUserByUserName(userName);
+
         if(user == null) return "User Not found!!!";
+        if(!user.getPassword().equals(password)) return "Password is Wrong!!!";
+
         if(!user.getUserStatus().equals(UserStatus.Admin)){
             return "You are not a admin You are not able to delete another account";
         }
@@ -164,4 +209,6 @@ public class UserService {
 
         return "delete account successfully";
     }
+
+
 }

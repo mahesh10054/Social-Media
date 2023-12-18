@@ -26,8 +26,10 @@ public class PostService {
 
     public String addPost(addPostRequest addPostRequest) {
          User user = userRepository.findUserByUserName(addPostRequest.getUserName());
+         String password = addPostRequest.getPassword();
 
          if(user == null) return "User Not Found";
+        if(!user.getPassword().equals(password)) return "Password is Wrong!!!";
 
          Post post = PostTransformer.convertAddPostRequestToEntity(addPostRequest,user);
 
@@ -38,9 +40,11 @@ public class PostService {
          return "Post Added Successfully";
     }
 
-    public ResponseEntity<?> getPost(String userName) {
+    public ResponseEntity<?> getPost(String userName,String password) {
         User user = userRepository.findUserByUserName(userName);
+
         if(user == null) return ResponseEntity.ok("User Not Found !!!");
+        if(!user.getPassword().equals(password)) return ResponseEntity.ok("Password is Wrong!!!");
 
         List<Post> postList = user.getPostList();
         if(postList == null) return ResponseEntity.ok("User dont Have Post !!!");
@@ -57,9 +61,11 @@ public class PostService {
         return ResponseEntity.ok(ans);
     }
 
-    public ResponseEntity<?> getOtherAccountPost(String userName, String otherUserName) {
+    public ResponseEntity<?> getOtherAccountPost(String userName, String password,String otherUserName) {
         User user = userRepository.findUserByUserName(userName);
+
         if(user == null) return ResponseEntity.ok("User Not Found !!!");
+        if(!user.getPassword().equals(password)) return ResponseEntity.ok("Password is Wrong!!!");
 
         User otherUser = userRepository.findUserByUserName(otherUserName);
         if(otherUser == null) return ResponseEntity.ok("Other User Not Found !!!");
