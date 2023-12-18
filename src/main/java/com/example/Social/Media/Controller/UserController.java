@@ -22,13 +22,18 @@ public class UserController {
     @PostMapping("/getAccount")
     public ResponseEntity<?> getAccount(@RequestParam String userName,@RequestParam String password)
     {
-        return userService.updateUserAccount(userName,password);
+        return userService.getAccount(userName,password);
+    }
+    @PostMapping("/updateAccount")
+    public ResponseEntity<?> updateAccount(@RequestParam String userName,@RequestParam String password, @RequestBody addUserRequest addUserRequest)
+    {
+        return userService.updateAccount(userName,password,addUserRequest);
     }
     // this function for send following request to another user
-    @PostMapping("/followingRequest")
-    public String followingRequest(@RequestParam String userName,@RequestParam String password,@RequestParam String followerName)
+    @PostMapping("/sendFollowingRequest")
+    public String sendFollowingRequest(@RequestParam String userName,@RequestParam String password,@RequestParam String followingUserName)
     {
-        return userService.followingRequest(userName, password,followerName);
+        return userService.sendFollowingRequest(userName, password,followingUserName);
     }
 
     // this function for get following list

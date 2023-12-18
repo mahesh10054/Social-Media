@@ -36,17 +36,7 @@ public class UserService {
             return "User Email Already Exist";
 
         String email = addUserRequest.getEmail();
-        int eLength = email.length();
-        String str = "@gmail.com";
-
-        if(eLength <= str.length())
-        {
-            return "Please Enter Valid Email Address";
-        }
-        int n = eLength - str.length();
-        String s = email.substring(n,eLength);
-
-        if(!str.equals(s))
+        if(! emailVerification(email))
         {
             return "Please Enter Valid Email Address";
         }
@@ -59,16 +49,60 @@ public class UserService {
         return "User Added Successfully";
     }
 
-    public ResponseEntity<?> updateUserAccount(String userName, String password) {
+    public ResponseEntity<?> getAccount(String userName, String password) {
         User user = userRepository.findUserByUserName(userName);
-        if(user == null) return ResponseEntity.ok("User Does Not Exist");
 
+        if(user == null) return ResponseEntity.ok("User Does Not Exist");
         if(!user.getPassword().equals(password)) return ResponseEntity.ok("Password is Wrong!!!");
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userDummyTransformer.convertUserRequestToEntity(user));
     }
+    private boolean emailVerification(String email)
+        {
+            int eLength = email.length();
+            String str = "@gmail.com";
+
+            if(eLength <= str.length())
+            {
+                return false;
+            }
+            int n = eLength - str.length();
+            String s = email.substring(n,eLength);
+
+            if(!str.equals(s))
+            {
+                return false;
+            }
+            return true;
+        }
+    public ResponseEntity<?> updateAccount(String userName, String password, addUserRequest addUserRequest) {
+        User user = userRepository.findUserByUserName(userName);
+
+        if(user == null) return ResponseEntity.ok("User Does Not Exist");
+        if(!user.getPassword().equals(password)) return ResponseEntity.ok("Password is Wrong!!!");
+
+        String email = addUserRequest.getEmail();
+        if(!emailVerification(email))
+        {
+            return ResponseEntity.ok("Please Enter Valid Email Address");
+        }
+
+        if(!user.getUserName().equals(addUserRequest.getUserName()) && userRepository.findUserByUserName(addUserRequest.getUserName()) != null) return ResponseEntity.ok("Please Enter another userName");
+
+        user.setUserName(addUserRequest.getUserName());
+        user.setUserStatus(addUserRequest.getUserStatus());
+        user.setBio(addUserRequest.getBio());
+        user.setEmail(addUserRequest.getEmail());
+        user.setPassword(addUserRequest.getPassword());
+        user.setProfilePictureUrl(addUserRequest.getProfilePictureUrl());
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Your Profile has been Updated!!!");
+    }
+
     // this function for send following request to another user
-    public String followingRequest(String userName,String password,String followingUserName) {
+    public String sendFollowingRequest(String userName,String password,String followingUserName) {
         User user = userRepository.findUserByUserName(userName); // here we can get user account
         User followinguser = userRepository.findUserByUserName(followingUserName); //here we get following user account
 
@@ -209,6 +243,7 @@ public class UserService {
 
         return "delete account successfully";
     }
+
 
 
 }
