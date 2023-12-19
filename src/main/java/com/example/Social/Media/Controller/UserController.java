@@ -19,21 +19,39 @@ public class UserController {
     {
         return userService.createAccount(addUserRequest);
     }
+
+    // this function return all information of user account
     @PostMapping("/getAccount")
     public ResponseEntity<?> getAccount(@RequestParam String userName,@RequestParam String password)
     {
         return userService.getAccount(userName,password);
     }
+
+    // this function use to update user information
     @PostMapping("/updateAccount")
     public ResponseEntity<?> updateAccount(@RequestParam String userName,@RequestParam String password, @RequestBody addUserRequest addUserRequest)
     {
         return userService.updateAccount(userName,password,addUserRequest);
     }
-    // this function for send following request to another user
-    @PostMapping("/sendFollowingRequest")
-    public String sendFollowingRequest(@RequestParam String userName,@RequestParam String password,@RequestParam String followingUserName)
+
+    // this function for send friend request to another user
+    @PostMapping("/sendFriendRequest")
+    public String sendFriendRequest(@RequestParam String userName,@RequestParam String password,@RequestParam String followingUserName)
     {
-        return userService.sendFollowingRequest(userName, password,followingUserName);
+        return userService.sendFriendRequest(userName, password,followingUserName);
+    }
+
+    // in this function you can see who can send friend request
+    @GetMapping("/getFriendRequest")
+    public ResponseEntity<?> getFriendRequest(@RequestParam String userName,@RequestParam String password)
+    {
+        return userService.getFriendRequest(userName, password);
+    }
+    // here we can accept friend request
+    @PostMapping("/acceptFriendRequest")
+    public String acceptFriendRequest(@RequestParam String userName,@RequestParam String password)
+    {
+        return userService.acceptFriendRequest(userName, password);
     }
 
     // this function for get following list
@@ -57,13 +75,13 @@ public class UserController {
         return userService.getAllPost(userName,password);
     }
 
-    // this function for only admin which can get all user account
+    // this function only for admin which can get all user account
     @GetMapping("/getAllAccount")
     public ResponseEntity<?> getAllAccount(@RequestParam String userName, @RequestParam String password)
     {
         return userService.getAllAccount(userName,password);
     }
-    // this account for admin. if admin want to delete user account
+    // this function for admin. if admin want to delete any user account
     @DeleteMapping("/deleteAccount")
     public String deleteAccount(@RequestParam String userName, @RequestParam String password, @RequestParam String deleteUserName)
     {

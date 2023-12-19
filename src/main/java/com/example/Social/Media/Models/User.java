@@ -33,6 +33,12 @@ public class User {
     @CollectionTable(name = "follow", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "follow")
     private List<String> follow;
+
+    @ElementCollection
+    @CollectionTable(name = "acceptFriendRequest", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "acceptFriendRequest")
+    private List<String> acceptFriendRequest;
+
     @ElementCollection
     @CollectionTable(name = "following", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "following")

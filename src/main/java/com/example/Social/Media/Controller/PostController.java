@@ -13,16 +13,20 @@ public class PostController {
     @Autowired // By using autowired annotation we create object of another class without using new keyword
     PostService postService;
 
+    // this function for add post
     @PostMapping("/addPost")
     public String addPost(@RequestBody addPostRequest addPostRequest)
     {
         return postService.addPost(addPostRequest);
     }
+
+    // this function for get the post
     @GetMapping("/getPost")
     public ResponseEntity<?> getPost(@RequestParam String userName, @RequestParam String password)
     {
         return postService.getPost(userName,password);
     }
+    // this function admin. to see the post of anyone
     @GetMapping("/getOtherAccountPost/{otherUserName}")
     public ResponseEntity<?> getOtherAccountPost(@RequestParam String userName,@RequestParam String password,@PathVariable String otherUserName)
     {
